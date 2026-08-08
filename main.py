@@ -44,7 +44,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.mount("/static", StaticFiles(directory=Path(__file__).parent / "static"), name="static")
+STATIC_DIR = Path(__file__).parent / "static"
+STATIC_DIR.mkdir(parents=True, exist_ok=True)  # evita crash no boot se a pasta não veio no deploy
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 CATALOG_ID = "dublado-ptbr-animes"
 SEED_PATH = Path(__file__).parent / "anime_catalog_seed.json"
