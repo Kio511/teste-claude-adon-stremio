@@ -63,7 +63,7 @@ MANIFEST = {
         {
             "type": "series",
             "id": CATALOG_ID,
-            "name": "Animes Dublados PT-BR",
+            "name": "🇧🇷 Dublados PT-BR",
         }
     ],
     "idPrefixes": ["tt"],
