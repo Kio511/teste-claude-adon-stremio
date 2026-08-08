@@ -2,29 +2,55 @@
 
 Addon que checa (via JustWatch) se um filme/série/anime tem dublagem em
 português do Brasil disponível em algum serviço de streaming (Crunchyroll,
-Netflix, Prime Video, etc.), e mostra isso como uma tag na lista de streams.
+Netflix, Prime Video, etc.), e mostra isso:
+
+- na **tela de detalhes** do título (descrição + tag), antes de abrir a lista de episódios;
+- na **lista de streams**;
+- num **catálogo próprio** "Animes Dublados PT-BR", navegável, já filtrado.
+
+O addon é **configurável**: em `/configure` a pessoa escolhe se quer
+considerar todos os serviços ou só um específico (Crunchyroll, Netflix
+ou Prime Video), e isso gera um link de instalação próprio — inclusive
+com botão de instalação direta (`stremio://`) pra facilitar compartilhar.
 
 ## Como funciona
 
 ```
-Stremio pede /stream/series/tt1234567.json
+Pessoa acessa /configure
         │
         ▼
-  cache.get(imdb_id) ──► hit? retorna direto (TTL 7 dias)
+  escolhe o serviço (ou "todos") → link de instalação gerado na hora
+        │
+        ▼
+Stremio pede /{config}/manifest.json, depois /{config}/meta/... etc.
+        │
+        ▼
+  addon_config.py decodifica a preferência da URL
+        │
+        ▼
+  cache.get(imdb_id) ──► hit? usa direto (TTL 7 dias)
         │ miss
         ▼
-  cinemeta.get_title(imdb_id)  → resolve o título a partir do imdb_id
+  cinemeta.get_full_meta(imdb_id)  → nome, poster, descrição, episódios
         │
         ▼
   justwatch_client.check_pt_br_dubbing(título, imdb_id)
         │  busca na JustWatch (país=BR), confirma pelo imdb_id,
         │  olha offer.audio_languages procurando "pt"
         ▼
-  cache.set(imdb_id, resultado)
+  cache.set(imdb_id, resultado)  ← guarda TODOS os provedores encontrados
         │
         ▼
-  retorna streams: [{ name: "🇧🇷 Dublado PT-BR", ... }]
+  addon_config.filter_providers()  ← filtra conforme a config da pessoa
+        │
+        ▼
+  meta / stream / catalog respondem já filtrados
 ```
+
+Importante: o cache guarda o resultado **sem filtro** (todos os
+provedores encontrados), e o filtro por configuração é aplicado só na
+hora de responder. Assim, uma única consulta à JustWatch serve pessoas
+com configurações diferentes, sem duplicar trabalho.
 
 ## Rodar localmente
 
@@ -35,29 +61,55 @@ pip install -r requirements.txt
 uvicorn main:app --reload --port 7000
 ```
 
-Depois, no Stremio: `Addons` → `Community Addons` → cole a URL:
-
-```
-http://127.0.0.1:7000/manifest.json
-```
+Abra `http://127.0.0.1:7000/configure` no navegador, escolha a
+configuração e clique em instalar (ou copie o link gerado).
 
 ## ⚠️ Passo obrigatório: prioridade do addon
 
-A partir da v0.2, o addon usa o resource `meta` pra mostrar a dublagem
-**na tela de detalhes** (descrição + tag), antes de abrir a lista de
-episódios — não só na lista de streams.
-
-Só que o Stremio já vem com o **Cinemeta** instalado por padrão, que
-também serve `meta` pros mesmos títulos. Quando dois addons oferecem
-`meta` pro mesmo item, o Stremio usa o de **maior prioridade** — ou
-seja, se o Cinemeta estiver antes do nosso addon na lista, o Cinemeta
-"ganha" e nossa tag nunca aparece.
+O Stremio já vem com o **Cinemeta** instalado por padrão, que também
+serve `meta` pros mesmos títulos. Quando dois addons oferecem `meta`
+pro mesmo item, o Stremio usa o de **maior prioridade** — ou seja, se
+o Cinemeta estiver antes do nosso addon na lista, o Cinemeta "ganha" e
+nossa tag não aparece na descrição.
 
 **Correção:** depois de instalar, vá em `Addons` no Stremio, ache
-"Dublado PT-BR?" na lista e **arraste ele pra cima do Cinemeta**
-(ou use o botão de mover, se o app tiver). Sem esse passo, a tag só vai
-aparecer na lista de streams (resource `stream`, que continua funcionando
-independente disso), não na descrição.
+"Dublado PT-BR?" na lista e **arraste ele pra cima do Cinemeta**. Sem
+esse passo, a tag só aparece na lista de streams e no catálogo
+próprio, não na descrição do título.
+
+## Sobre o catálogo "Animes Dublados PT-BR"
+
+O arquivo `anime_catalog_seed.json` tem uma lista inicial de ~18 animes
+populares (imdb_id) usada pra popular o catálogo. **Os IDs vieram de
+memória e podem estar errados** — não consegui verificar cada um numa
+chamada real de rede a partir deste ambiente de desenvolvimento. Antes
+de divulgar publicamente, confira cada `imdb_id` em imdb.com e corrija
+o que precisar. É só editar o JSON e fazer redeploy — sem precisar
+mexer em código.
+
+Pra expandir a lista, adicione objetos no formato:
+```json
+{"imdb_id": "tt1234567", "type": "series", "nome_referencia": "Nome só pra você lembrar"}
+```
+
+O catálogo hoje é limitado a essa lista curada porque montar um
+catálogo dinâmico de "todo anime que existe" exigiria uma fonte de
+dados própria de animes (tipo AniList/MAL) cruzada com a JustWatch —
+uma melhoria possível pro futuro.
+
+## Sobre a divulgação pública
+
+Se quiser divulgar pra mais gente (não só você testando):
+- **Plano free do Render tem cold start (~1min)** depois de 15 min
+  sem uso — pra um público maior, considere o plano pago mais barato
+  do Render (elimina o "acordar"), ou pelo menos avise isso na
+  descrição do addon/README.
+- A página `/configure` já serve como "landing page" de instalação —
+  esse é o link que você compartilha, não a URL do manifest direto.
+- Pra aparecer na busca de addons dentro do próprio Stremio (sem
+  precisar do usuário colar link), dá pra submeter em
+  https://stremio-addons.net — eles pedem o manifest público e passam
+  por uma revisão.
 
 ## Limitações conhecidas (importante ler)
 

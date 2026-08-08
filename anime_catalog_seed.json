@@ -1,0 +1,23 @@
+{
+  "_comentario": "Lista inicial (seed) do catálogo. IDs vieram de memória e PODEM estar errados ou desatualizados — confira cada um em imdb.com antes de confiar 100%. Adicione mais linhas livremente, é só {imdb_id, type: 'series' ou 'movie'}.",
+  "titulos": [
+    {"imdb_id": "tt2560140", "type": "series", "nome_referencia": "Attack on Titan"},
+    {"imdb_id": "tt0877057", "type": "series", "nome_referencia": "Death Note"},
+    {"imdb_id": "tt0409591", "type": "series", "nome_referencia": "Naruto"},
+    {"imdb_id": "tt9335498", "type": "series", "nome_referencia": "Demon Slayer"},
+    {"imdb_id": "tt5626028", "type": "series", "nome_referencia": "My Hero Academia"},
+    {"imdb_id": "tt12343534", "type": "series", "nome_referencia": "Jujutsu Kaisen"},
+    {"imdb_id": "tt1355642", "type": "series", "nome_referencia": "Fullmetal Alchemist: Brotherhood"},
+    {"imdb_id": "tt2250192", "type": "series", "nome_referencia": "Sword Art Online"},
+    {"imdb_id": "tt3741634", "type": "series", "nome_referencia": "Tokyo Ghoul"},
+    {"imdb_id": "tt4508902", "type": "series", "nome_referencia": "One Punch Man"},
+    {"imdb_id": "tt2098220", "type": "series", "nome_referencia": "Hunter x Hunter (2011)"},
+    {"imdb_id": "tt13706018", "type": "series", "nome_referencia": "Spy x Family"},
+    {"imdb_id": "tt15226092", "type": "series", "nome_referencia": "Chainsaw Man"},
+    {"imdb_id": "tt5666350", "type": "series", "nome_referencia": "Mob Psycho 100"},
+    {"imdb_id": "tt9829624", "type": "series", "nome_referencia": "Vinland Saga"},
+    {"imdb_id": "tt1910272", "type": "series", "nome_referencia": "Steins;Gate"},
+    {"imdb_id": "tt0213338", "type": "series", "nome_referencia": "Cowboy Bebop"},
+    {"imdb_id": "tt0934075", "type": "series", "nome_referencia": "Code Geass"}
+  ]
+}
