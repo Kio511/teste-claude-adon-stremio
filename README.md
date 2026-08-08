@@ -41,6 +41,24 @@ Depois, no Stremio: `Addons` → `Community Addons` → cole a URL:
 http://127.0.0.1:7000/manifest.json
 ```
 
+## ⚠️ Passo obrigatório: prioridade do addon
+
+A partir da v0.2, o addon usa o resource `meta` pra mostrar a dublagem
+**na tela de detalhes** (descrição + tag), antes de abrir a lista de
+episódios — não só na lista de streams.
+
+Só que o Stremio já vem com o **Cinemeta** instalado por padrão, que
+também serve `meta` pros mesmos títulos. Quando dois addons oferecem
+`meta` pro mesmo item, o Stremio usa o de **maior prioridade** — ou
+seja, se o Cinemeta estiver antes do nosso addon na lista, o Cinemeta
+"ganha" e nossa tag nunca aparece.
+
+**Correção:** depois de instalar, vá em `Addons` no Stremio, ache
+"Dublado PT-BR?" na lista e **arraste ele pra cima do Cinemeta**
+(ou use o botão de mover, se o app tiver). Sem esse passo, a tag só vai
+aparecer na lista de streams (resource `stream`, que continua funcionando
+independente disso), não na descrição.
+
 ## Limitações conhecidas (importante ler)
 
 1. **JustWatch não é API oficial.** É engenharia reversa do GraphQL que o
